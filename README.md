@@ -45,4 +45,8 @@ Add the following queries to Archtype and execute them periodically:
 
 ## Demo Case 2: Zone-Level Resiliency
 
-1. Connect the app to a Yugabyte Platform cluster.
+1. Deploy a multi-zone three node cluster with Yugabyte Platform.
+2. Connect the app to the Platform cluster. Make sure to provide the `dataSource.additionalEndpoints` parameter in the `properties\yugabyte-template.properties` file.
+3. Show that INSERTs from the app and SELECTS on the Archtype end succeeed.
+4. Kill one of the nodes (not the one Archtype is connected to).
+

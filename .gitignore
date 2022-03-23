@@ -2,3 +2,4 @@
 .vscode/settings.json
 target/market-orders-app.jar
 /target/
+/platform_secrets/
