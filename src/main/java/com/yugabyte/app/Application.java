@@ -67,7 +67,7 @@ public class Application {
         Properties connProps = new Properties();
         
         connProps.load(new FileInputStream(
-            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/yugabyte-platform-example.properties"));
+            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/mysql.properties"));
         
         HikariConfig config = new HikariConfig(connProps);
         config.validate();

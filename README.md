@@ -2,6 +2,15 @@
 
 Storing and processing real-time data stream with YugabyteDB.
 
+## Start MySQL in Docker
+
+* Start a MySQL instance and load sample data:
+    ```shell
+    docker-compose -f docker-compose-mysql.yml up
+    ```
+
+    The container exposes port `3307` for connections from the host.
+
 ## Build and run Java app
 
 * Build and package the app:
@@ -19,7 +28,7 @@ Add the following queries to Archtype and execute them periodically:
 
 * Max trade ID number (to confirm the data is being added to the database):
     ```sql
-    select max(id) from trade;
+    select max(id) from Trade;
     ```
 * Most popular symbols:
     ```sql
@@ -28,9 +37,9 @@ Add the following queries to Archtype and execute them periodically:
 
 * Top buyers:
     ```sql
-    SELECT buyer.id, first_name, last_name, sum(bid_price) as total FROM Buyer
-    JOIN Trade ON trade.buyer_id = buyer.id
-    GROUP BY (buyer.id) ORDER BY total DESC;
+    SELECT Buyer.id, first_name, last_name, sum(bid_price) as total FROM Buyer
+    JOIN Trade ON Trade.buyer_id = Buyer.id
+    GROUP BY (Buyer.id) ORDER BY total DESC;
     ```
 
 ## Demo Case 1: Live Infrastructure Update

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Stop the containers
+docker-compose -f docker-compose-mysql.yml down
+
+# Delete all containers
+docker rm -f $(docker ps -a -q)
+
+# Delete all volumes
+docker volume rm $(docker volume ls -q)
