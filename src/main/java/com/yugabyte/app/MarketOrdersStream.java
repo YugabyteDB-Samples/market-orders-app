@@ -13,6 +13,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Random;
@@ -45,8 +46,10 @@ public class MarketOrdersStream {
     }
 
     public void start() throws SQLException {
-        buyersCount = dataSource.getConnection().createStatement().
-            executeQuery("SELECT max(id) FROM Buyer").getInt(0);
+        ResultSet result = dataSource.getConnection().createStatement().
+            executeQuery("SELECT max(id) FROM Buyer");
+        result.next();
+        buyersCount = result.getInt(1);
 
         PNConfiguration cfg = new PNConfiguration();
         cfg.setSubscribeKey(STREAM_SUBSCRIPION_KEY);
@@ -95,20 +98,40 @@ public class MarketOrdersStream {
             JsonElement mes = result.getMessage();
             JsonObject json = mes.getAsJsonObject();
 
-            try {
-                Connection conn = dataSource.getConnection();
-                PreparedStatement pStatement = conn.prepareStatement(
-                    "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
+            while (true) {
+                try {
+                    Connection conn = dataSource.getConnection();
+                    PreparedStatement pStatement = conn.prepareStatement(
+                        "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
 
-                pStatement.setInt(1, new Random().nextInt(buyersCount) + 1);
-                pStatement.setString(2, json.get("symbol").getAsString());
-                pStatement.setInt(3, json.get("order_quantity").getAsInt());
-                pStatement.setDouble(4, json.get("bid_price").getAsDouble());
-                pStatement.setString(5, json.get("trade_type").getAsString());
+                    pStatement.setInt(1, new Random().nextInt(buyersCount) + 1);
+                    pStatement.setString(2, json.get("symbol").getAsString());
+                    pStatement.setInt(3, json.get("order_quantity").getAsInt());
+                    pStatement.setDouble(4, json.get("bid_price").getAsFloat());
+                    pStatement.setString(5, json.get("trade_type").getAsString());
 
-                pStatement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
+                    pStatement.executeUpdate();
+
+                    // returning connection to the pool (it's not being closed)
+                    conn.close();
+
+                    return;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+
+                    if (e.getSQLState().equals("57P01")) {
+                        System.out.println("The admin is shutting down or restarting a node the connection was open with."
+                             + " Retrying the operation using another connection from the pool ...");
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                        continue;
+                    }
+
+                    return;
+                }
             }
         }
 

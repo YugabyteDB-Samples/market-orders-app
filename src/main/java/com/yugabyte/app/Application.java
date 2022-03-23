@@ -19,6 +19,7 @@ package com.yugabyte.app;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -45,13 +46,20 @@ public class Application {
         Application app = new Application();
 
         try {
+            System.out.println("Connecting to the database...");
+
             HikariDataSource dataSource = app.openDataSource();
 
-            // Starting Market Ticker.
+            System.out.println("Connected to the database: " + dataSource.getJdbcUrl());
+
+            System.out.println("Connecting to the market orders stream...");
             ordersStream = new MarketOrdersStream(dataSource);
             ordersStream.start();
+            System.out.println("Connected to the stream");
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -60,7 +68,7 @@ public class Application {
         Properties connProps = new Properties();
         
         connProps.load(new FileInputStream(
-            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/yugabyte.properties"));
+            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/my-yb-cloud.properties"));
         
         HikariConfig config = new HikariConfig(connProps);
         config.validate();
