@@ -3,3 +3,4 @@
 target/market-orders-app.jar
 /target/
 /platform_secrets/
+/migrations/*

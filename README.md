@@ -11,6 +11,23 @@ Storing and processing real-time data stream with YugabyteDB.
 
     The container exposes port `3307` for connections from the host.
 
+## Migration from Postgres to Yugabyte Cloud
+
+1. Navigate to the root of the project.
+
+2. Migrate the schema and data from Postgres:
+    ```shell
+    yb_migrate export --source-db-type postgresql --source-db-uri postgresql://postgres:postgres@localhost:5438  --export-dir ./migrations 
+    ```
+3. Import schema to your Yugabyte Cloud cluster:
+    ```shell
+    yb_migrate import schema --target-db-host c7d3829a-0fb4-493e-8684-60e75739bf6b.aws.ybdb.io --target-db-port 5433 --target-db-user admin --target-db-password t0T-BdVCu2opsgoWsG5h-nZqMdakfV --target-db-name yugabyte --export-dir ./migrations
+    ```
+4. Import data to Yugabyte Cloud:
+    ```shell
+    yb_migrate import data --target-db-host c7d3829a-0fb4-493e-8684-60e75739bf6b.aws.ybdb.io --target-db-port 5433 --target-db-user admin --target-db-password t0T-BdVCu2opsgoWsG5h-nZqMdakfV --target-db-name yugabyte --target-ssl-mode verify-full --target-ssl-root-cert /Users/dmagda/Downloads/root.crt --export-dir ./migrations --start-clean YES
+    ```    
+
 ## Build and run Java app
 
 * Build and package the app:
