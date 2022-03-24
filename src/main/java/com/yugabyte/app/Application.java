@@ -56,6 +56,9 @@ public class Application {
             ordersStream.start();
             System.out.println("Connected to the stream");
 
+            TradeStats stats = new TradeStats(dataSource, 5000);
+            stats.printStats();
+            
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -67,7 +70,7 @@ public class Application {
         Properties connProps = new Properties();
         
         connProps.load(new FileInputStream(
-            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/mysql.properties"));
+            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/postgres.properties"));
         
         HikariConfig config = new HikariConfig(connProps);
         config.validate();

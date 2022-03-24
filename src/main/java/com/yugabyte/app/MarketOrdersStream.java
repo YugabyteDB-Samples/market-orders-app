@@ -117,20 +117,20 @@ public class MarketOrdersStream {
 
                     return;
                 } catch (SQLException e) {
-                    e.printStackTrace();
-
                     if (e.getSQLState().equals("57P01")) {
-                        System.out.println("The admin is shutting down or restarting a node the connection was open with."
-                             + " Retrying the operation using another connection from the pool ...");
+                        System.err.println(e.getMessage());
+                        System.out.println("Retrying the rejected query...");
+
                         try {
                             Thread.sleep(2000);
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
                         }
                         continue;
+                    } else {
+                        e.printStackTrace();
+                        return;
                     }
-
-                    return;
                 }
             }
         }
