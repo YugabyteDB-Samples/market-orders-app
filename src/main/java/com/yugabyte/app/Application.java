@@ -29,25 +29,26 @@ public class Application {
     private static MarketOrdersStream ordersStream;
 
     public static void main(String args[]) {
-        // int execTime = DEFAULT_EXEC_TIME_MINS;
+        int tradeStatsInterval = 0;
+        String connectionPropsFile = "./properties/postgres.properties";
 
-        // if (args != null) {
-        //     for (String arg : args) {
-        //         if (arg.startsWith("execTime")) {
-        //             execTime = Integer.parseInt(arg.split("=")[1]);
-        //         } else {
-        //             System.err.println("Unsupported parameter: " + execTime);
-        //             return;
-        //         }
-        //     }
-        // }
+        if (args != null) {
+            for (String arg : args) {
+                if (arg.startsWith("tradeStatsInterval")) {
+                    tradeStatsInterval = Integer.parseInt(arg.split("=")[1].trim());
+
+                } else if (arg.startsWith("connectionProps")) {
+                    connectionPropsFile = arg.split("=")[1].trim();
+                }
+            }
+        }
 
         Application app = new Application();
 
         try {
             System.out.println("Connecting to the database...");
 
-            HikariDataSource dataSource = app.openDataSource();
+            HikariDataSource dataSource = app.openDataSource(connectionPropsFile);
 
             System.out.println("Connected to the database: " + dataSource.getJdbcUrl());
 
@@ -56,9 +57,11 @@ public class Application {
             ordersStream.start();
             System.out.println("Connected to the stream");
 
-            TradeStats stats = new TradeStats(dataSource, 5000);
-            stats.printStats();
-            
+            if (tradeStatsInterval > 0) {
+                TradeStats stats = new TradeStats(dataSource, tradeStatsInterval);
+                stats.printStats();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -66,11 +69,10 @@ public class Application {
         }
     }
 
-    private HikariDataSource openDataSource() throws IOException {
+    private HikariDataSource openDataSource(String connPropsFile) throws IOException {
         Properties connProps = new Properties();
         
-        connProps.load(new FileInputStream(
-            "/Users/dmagda/Downloads/sample_projects/market-orders-app/properties/postgres.properties"));
+        connProps.load(new FileInputStream(connPropsFile));
         
         HikariConfig config = new HikariConfig(connProps);
         config.validate();

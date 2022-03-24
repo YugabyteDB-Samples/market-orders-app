@@ -44,10 +44,15 @@ Alternatively, import to a Yugabyte Platform cluster:
     ```shell
     mvn clean package 
     ```
-* Run the app:
+* Run the app with Postgres and no trade stats:
+    ```shell
+    java -jar target/market-orders-app.jar
+    ```
+* Run the app with Yugabyte Cloud and trade stats:
+
 ```shell
-java -jar target/market-orders-app.jar
-```    
+java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-cloud.properties tradeStatsInterval=5000
+```
 
 ## Prepare Arctype Queries and Dashboards
 
