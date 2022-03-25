@@ -6,3 +6,4 @@ target/market-orders-app.jar
 /migrations/*
 properties/yugabyte-cloud.properties
 properties/yugabyte-platform.properties
+demo/my_demo_sript.md

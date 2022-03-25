@@ -1,37 +1,24 @@
-# Market Orders Data Stream Processing With YugabyteDB
+# Market Orders Streaming to YugabyteDB
 
-Storing and processing real-time data stream with YugabyteDB.
+The application subscribes to the [PubNub's market orders stream](https://www.pubnub.com/developers/realtime-data-streams/financial-securities-market-orders/) and stores the market trades in an underlying database. You can switch between MySQL, PostgreSQL and YugabyteDB with no need to update the application logic.
 
-## Start MySQL in Docker
-
+## Start Database
+ 
 * Start a MySQL instance and load sample data:
     ```shell
     docker-compose -f docker-compose-mysql.yml up
     ```
 
-    The container exposes port `3307` for connections from the host.
+    Use port `3307` for connections from the host machine.
 
-## Migration from Postgres to Yugabyte Cloud
-
-1. Navigate to the root of the project.
-
-2. Remove the existing migration directory:
+* or start a PostgreSQL database instead:
     ```shell
-    rm -r ./migrations
+    docker-compose -f docker-compose-postgres.yml up
     ```
 
-2. Migrate the schema and data from Postgres:
-    ```shell
-    yb_migrate export --source-db-type postgresql --source-db-uri postgresql://postgres:postgres@localhost:5438  --export-dir ./migrations 
-    ```
-3. Import schema:
-    ```shell
-    yb_migrate import schema --target-db-host 10.204.0.5 --target-db-port 5433 --target-db-user yugabyte --target-db-password MarketOrders1@ --target-db-name yugabyte --export-dir ./migrations
-    ```
-4. Import data:
-    ```shell
-    yb_migrate import data --target-db-host 10.204.0.5 --target-db-port 5433 --target-db-user yugabyte --target-db-password MarketOrders1@ --target-db-name yugabyte --export-dir ./migrations
-    ```    
+    Use port `5438` for connections from the host machine.
+
+* or start a [Yugabyte Cloud](https://docs.yugabyte.com/latest/yugabyte-cloud/cloud-quickstart/) instance, and load the schema (`./schema/schema_postgres.sql`) and sample data (`./schema/data.sql`).
 
 ## Build and run Java app
 
@@ -39,56 +26,25 @@ Storing and processing real-time data stream with YugabyteDB.
     ```shell
     mvn clean package 
     ```
-* Run the app with Postgres and no trade stats:
+* Run the app by connecting to the selected database:
+
+    * Connect to Postgres (`./properties/postgres.properties`):
     ```shell
-    java -jar target/market-orders-app.jar
+    java -jar target/market-orders-app.jar connectionProps=./properties/postgres.properties tradeStatsInterval=5000
     ```
-* Run the app with Yugabyte Cloud and trade stats:
-
-```shell
-java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-cloud.properties tradeStatsInterval=5000
-```
-
-* Run the app with Platform and trade stats:
-
-```shell
-java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-platform.properties tradeStatsInterval=5000
-```
-
-## Prepare Arctype Queries and Dashboards
-
-Add the following queries to Archtype and execute them periodically:
-
-* Max trade ID number (to confirm the data is being added to the database):
-    ```sql
-    select max(id) from Trade;
-    ```
-* Most popular symbols:
-    ```sql
-    SELECT symbol, SUM(bid_price) as total FROM Trade GROUP BY(symbol) ORDER BY total DESC;
+    * Connect to MySQL (`./properties/mysql.properties`):
+    ```shell
+    java -jar target/market-orders-app.jar connectionProps=./properties/mysql.properties tradeStatsInterval=5000
     ``` 
+    * Connect to Yugabyte Cloud after providing connecting settings in the `./properties/yugabyte-template.properties` file:
+    ```shell
+    java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-template.properties tradeStatsInterval=5000
+    ```    
 
-* Top buyers:
-    ```sql
-    SELECT Buyer.id, first_name, last_name, sum(bid_price) as total FROM Buyer
-    JOIN Trade ON Trade.buyer_id = Buyer.id
-    GROUP BY (Buyer.id) ORDER BY total DESC;
-    ```
+The `tradeStatsInterval` (measured in milliseconds) instructs the `TradeStats.java` service to query trade-related statistics from the database within the specified interval. If the interval is <= `0` or not set, then the statistics will not be collected.
 
-## Demo Case 1: Live Infrastructure Update
+## Advanced Demo 
 
-1. Connect the app to Yugabyte Cloud
-2. Execute SQL queries from the Archtype section above to confirm the cluster is under load.
-3. Use the infrastructure upgrade feature of the cloud.
-4. While the infrastructure is being upgraded, show that the same queries keep executing. 
-    * Note, an INSERT can fail in the app saying `The admin is shutting down or restarting a node the connection was open with.`. 
-    This operation will be repetead again using another connection from the pool.
-    * A SELECT might fail in Arctype due to the same reason. Arctype will use another connection next time you ask to execute the query.
-
-## Demo Case 2: Zone-Level Resiliency
-
-1. Deploy a multi-zone three node cluster with Yugabyte Platform.
-2. Connect the app to the Platform cluster. Make sure to provide the `dataSource.additionalEndpoints` parameter in the `properties\yugabyte-template.properties` file.
-3. Show that INSERTs from the app and SELECTS on the Archtype end succeeed.
-4. Kill one of the nodes (not the one Archtype is connected to).
+The app can be used to demonstrate the migration from PostreSQL/MySQL to YugabyteDB as well as high-avalability and scalability capabilities of YugabyteDB. 
+Follow [this page](./demo/demo_sript.md) for more details.
 
