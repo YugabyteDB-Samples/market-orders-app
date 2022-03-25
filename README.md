@@ -15,27 +15,22 @@ Storing and processing real-time data stream with YugabyteDB.
 
 1. Navigate to the root of the project.
 
+2. Remove the existing migration directory:
+    ```shell
+    rm -r ./migrations
+    ```
+
 2. Migrate the schema and data from Postgres:
     ```shell
     yb_migrate export --source-db-type postgresql --source-db-uri postgresql://postgres:postgres@localhost:5438  --export-dir ./migrations 
     ```
-3. Import schema to your Yugabyte Cloud cluster:
+3. Import schema:
     ```shell
-    yb_migrate import schema --target-db-host c7d3829a-0fb4-493e-8684-60e75739bf6b.aws.ybdb.io --target-db-port 5433 --target-db-user admin --target-db-password t0T-BdVCu2opsgoWsG5h-nZqMdakfV --target-db-name yugabyte --export-dir ./migrations
+    yb_migrate import schema --target-db-host 10.204.0.5 --target-db-port 5433 --target-db-user yugabyte --target-db-password MarketOrders1@ --target-db-name yugabyte --export-dir ./migrations
     ```
-4. Import data to Yugabyte Cloud:
+4. Import data:
     ```shell
-    yb_migrate import data --target-db-host c7d3829a-0fb4-493e-8684-60e75739bf6b.aws.ybdb.io --target-db-port 5433 --target-db-user admin --target-db-password t0T-BdVCu2opsgoWsG5h-nZqMdakfV --target-db-name yugabyte --target-ssl-mode verify-full --target-ssl-root-cert /Users/dmagda/Downloads/root.crt --export-dir ./migrations --start-clean YES
-    ```    
-
-Alternatively, import to a Yugabyte Platform cluster:
-1. Import schema:
-    ```shell
-    yb_migrate import schema --target-db-host 35.222.104.222 --target-db-port 5433 --target-db-user yugabyte --target-db-password yugabyte --target-db-name yugabyte --export-dir ./migrations
-    ```
-2. Import data:
-    ```shell
-    yb_migrate import data --target-db-host 35.222.104.222 --target-db-port 5433 --target-db-user yugabyte --target-db-password yugabyte --target-db-name yugabyte --export-dir ./migrations
+    yb_migrate import data --target-db-host 10.204.0.5 --target-db-port 5433 --target-db-user yugabyte --target-db-password MarketOrders1@ --target-db-name yugabyte --export-dir ./migrations
     ```    
 
 ## Build and run Java app
@@ -52,6 +47,12 @@ Alternatively, import to a Yugabyte Platform cluster:
 
 ```shell
 java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-cloud.properties tradeStatsInterval=5000
+```
+
+* Run the app with Platform and trade stats:
+
+```shell
+java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-platform.properties tradeStatsInterval=5000
 ```
 
 ## Prepare Arctype Queries and Dashboards

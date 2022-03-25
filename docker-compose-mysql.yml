@@ -15,8 +15,8 @@ services:
       # <Port exposed> : < MySQL Port running inside container>
       - 3307:3306
     volumes:
-      - db:/var/lib/mysql
+      - dbmysql:/var/lib/mysql
       - ./schema/schema_mysql.sql:/docker-entrypoint-initdb.d/1.sql
       - ./schema/data.sql:/docker-entrypoint-initdb.d/2.sql
 volumes:
-  db:
+  dbmysql:
