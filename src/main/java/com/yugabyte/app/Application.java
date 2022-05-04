@@ -18,8 +18,11 @@ package com.yugabyte.app;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
+import java.util.Scanner;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -27,6 +30,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class Application {
     /* Market orders stream. */
     private static MarketOrdersStream ordersStream;
+
+    private static String loadScript;
 
     public static void main(String args[]) {
         int tradeStatsInterval = 0;
@@ -39,6 +44,8 @@ public class Application {
 
                 } else if (arg.startsWith("connectionProps")) {
                     connectionPropsFile = arg.split("=")[1].trim();
+                } else if (arg.startsWith("loadScript")) {
+                    loadScript = arg.split("=")[1].trim();
                 }
             }
         }
@@ -51,6 +58,12 @@ public class Application {
             HikariDataSource dataSource = app.openDataSource(connectionPropsFile);
 
             System.out.println("Connected to the database: " + dataSource.getJdbcUrl());
+
+            if (loadScript != null) {
+                System.out.println("Performing initial data load...");
+                app.loadData(dataSource);
+                System.out.println("Loaded schema and data");
+            }
 
             System.out.println("Connecting to the market orders stream...");
             ordersStream = new MarketOrdersStream(dataSource);
@@ -78,5 +91,22 @@ public class Application {
         config.validate();
 
         return new HikariDataSource(config);
+    }
+
+    private void loadData(HikariDataSource dataSource) throws IOException, SQLException {
+        Scanner scanner = new Scanner(new FileInputStream(loadScript));
+        scanner.useDelimiter(";");
+        
+        Connection conn = dataSource.getConnection();
+        Statement statement = conn.createStatement();
+        
+        while (scanner.hasNext()) {
+            String nextCommand = scanner.next().trim();
+            System.out.println(nextCommand);
+            statement.execute(nextCommand);
+        }
+
+        conn.close();
+
     }
 }

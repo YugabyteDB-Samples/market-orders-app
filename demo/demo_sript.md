@@ -118,9 +118,9 @@ The demo consists of four steps:
 
 7. Return to the Platform terminal window and start the app BUT now connect to the Platform cluster:
     ```shell
-    cat ./properties/yugabyte-platform.properties
+    cat ./properties/yugabytedb-anywhere.properties
 
-    java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-platform.properties tradeStatsInterval=5000
+    java -jar target/market-orders-app.jar connectionProps=./properties/yugabytedb-anywhere.properties tradeStatsInterval=5000
     ```
 
 8. Show that the data is being loaded. The migration went well!!!    
@@ -155,9 +155,9 @@ The demo consists of four steps:
 
 3. In the Platform terminal window, start the same application BUT connect to Yugabyte Cluster:
     ```shell
-    cat ./properties/yugabyte-cloud.properties
+    cat ./properties/yugabytedb-managed.properties
 
-    java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-cloud.properties tradeStatsInterval=5000
+    java -jar target/market-orders-app.jar connectionProps=./properties/yugabytedb-managed.properties tradeStatsInterval=5000
     ```
 
 4. Confirm the app inserts and prints out queries results.

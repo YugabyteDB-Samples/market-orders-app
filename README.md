@@ -18,7 +18,7 @@ The application subscribes to the [PubNub's market orders stream](https://www.pu
 
     Use port `5438` for connections from the host machine.
 
-* or start a [Yugabyte Cloud](https://docs.yugabyte.com/latest/yugabyte-cloud/cloud-quickstart/) instance, and load the schema (`./schema/schema_postgres.sql`) and sample data (`./schema/data.sql`).
+* or start a [YugabyteDB Managed](https://docs.yugabyte.com/latest/yugabyte-cloud/cloud-quickstart/) instance, and load the schema (`./schema/schema_postgres.sql`) and sample data (`./schema/data.sql`).
 
 ## Build and run Java app
 
@@ -36,7 +36,7 @@ The application subscribes to the [PubNub's market orders stream](https://www.pu
     ```shell
     java -jar target/market-orders-app.jar connectionProps=./properties/mysql.properties tradeStatsInterval=5000
     ``` 
-    * Connect to Yugabyte Cloud after providing connecting settings in the `./properties/yugabyte-template.properties` file:
+    * Connect to YugabyteDB Managed after providing connecting settings in the `./properties/yugabyte-template.properties` file:
     ```shell
     java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-template.properties tradeStatsInterval=5000
     ```    

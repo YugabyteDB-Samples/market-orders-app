@@ -58,6 +58,8 @@ public class MarketOrdersStream {
 
     private int buyersCount;
 
+    private long topBuyersViewLastRefreshTime;
+
     public MarketOrdersStream(HikariDataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -118,6 +120,7 @@ public class MarketOrdersStream {
             while (true) {
                 try {
                     Connection conn = dataSource.getConnection();
+
                     PreparedStatement pStatement = conn.prepareStatement(
                         "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
 
@@ -128,6 +131,13 @@ public class MarketOrdersStream {
                     pStatement.setString(5, json.get("trade_type").getAsString());
 
                     pStatement.executeUpdate();
+
+                    if (System.currentTimeMillis() - topBuyersViewLastRefreshTime >= 5000) {
+                        pStatement = conn.prepareStatement("REFRESH MATERIALIZED VIEW top_buyers_view;");
+                        pStatement.execute();
+
+                        topBuyersViewLastRefreshTime = System.currentTimeMillis();
+                    }
 
                     // returning connection to the pool (it's not being closed)
                     conn.close();
