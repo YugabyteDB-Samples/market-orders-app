@@ -60,8 +60,11 @@ public class MarketOrdersStream {
 
     private long topBuyersViewLastRefreshTime;
 
-    public MarketOrdersStream(HikariDataSource dataSource) {
+    private final boolean refreshMaterializedView;
+
+    public MarketOrdersStream(HikariDataSource dataSource, boolean refreshMaterializedView) {
         this.dataSource = dataSource;
+        this.refreshMaterializedView = refreshMaterializedView;
     }
 
     public void start() throws SQLException {
@@ -132,7 +135,7 @@ public class MarketOrdersStream {
 
                     pStatement.executeUpdate();
 
-                    if (System.currentTimeMillis() - topBuyersViewLastRefreshTime >= 5000) {
+                    if (refreshMaterializedView && System.currentTimeMillis() - topBuyersViewLastRefreshTime >= 5000) {
                         pStatement = conn.prepareStatement("REFRESH MATERIALIZED VIEW top_buyers_view;");
                         pStatement.execute();
 
