@@ -48,7 +48,8 @@ public class Application {
                 } else if (arg.startsWith("loadScript")) {
                     loadScript = arg.split("=")[1].trim();
                 } else if (arg.startsWith("refreshView")) {
-                    // workaround for read replicas case: https://yugabyte.atlassian.net/browse/DB-268
+                    // workaround for read replicas case:
+                    // https://yugabyte.atlassian.net/browse/DB-268
                     refreshMaterializedView = Boolean.valueOf(arg.split("=")[1].trim());
                 }
             }
@@ -88,29 +89,33 @@ public class Application {
 
     private HikariDataSource openDataSource(String connPropsFile) throws IOException {
         Properties connProps = new Properties();
-        
+
         connProps.load(new FileInputStream(connPropsFile));
-        
+
         HikariConfig config = new HikariConfig(connProps);
         config.validate();
 
         return new HikariDataSource(config);
     }
 
-    private void loadData(HikariDataSource dataSource) throws IOException, SQLException {
-        Scanner scanner = new Scanner(new FileInputStream(loadScript));
-        scanner.useDelimiter(";");
-        
-        Connection conn = dataSource.getConnection();
-        Statement statement = conn.createStatement();
-        
-        while (scanner.hasNext()) {
-            String nextCommand = scanner.next().trim();
-            System.out.println(nextCommand);
-            statement.execute(nextCommand);
+    private void loadData(HikariDataSource dataSource) {
+        try {
+            Scanner scanner = new Scanner(new FileInputStream(loadScript));
+            scanner.useDelimiter(";");
+
+            Connection conn = dataSource.getConnection();
+            Statement statement = conn.createStatement();
+
+            while (scanner.hasNext()) {
+                String nextCommand = scanner.next().trim();
+                System.out.println(nextCommand);
+                statement.execute(nextCommand);
+            }
+
+            conn.close();
+        } catch (Exception ex) {
+            System.err.println("Failed database preloading");
+            ex.printStackTrace();
         }
-
-        conn.close();
-
     }
 }

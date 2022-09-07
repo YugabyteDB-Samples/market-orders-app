@@ -2,8 +2,14 @@
 .vscode/settings.json
 target/market-orders-app.jar
 /target/
-/platform_secrets/
+/yb_platform_secrets/
 /migrations/*
 properties/yugabytedb-managed.properties
 properties/yugabytedb-anywhere.properties
 demo/my_demo_sript.md
+properties/postgres-gcp.properties
+spanner/pgadapter.jar
+properties/google-spanner.properties
+properties/aurora.properties
+properties/cockroach.properties
+spanner/spanner-service-account-keys.json

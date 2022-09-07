@@ -48,3 +48,24 @@ The `tradeStatsInterval` (measured in milliseconds) instructs the `TradeStats.ja
 The app can be used to demonstrate the migration from PostreSQL/MySQL to YugabyteDB as well as high-avalability and scalability capabilities of YugabyteDB. 
 Follow [this page](./demo/demo_sript.md) for more details.
 
+## Run in Docker
+
+1. Build the app:
+    ```shell
+    mvn clean package 
+    ```
+2. Create an image:
+    ```shell
+    docker rmi market-orders-app
+    docker build -t market-orders-app .
+    ```
+
+3. Start the app inside a container:
+    ```shell
+    docker run --name market-orders-instance --net yugabytedb_network \
+    market-orders-app:latest \
+    java -jar /home/target/market-orders-app.jar \
+    connectionProps=/home/yugabyte-docker.properties \
+    loadScript=/home/schema_postgres.sql \
+    tradeStatsInterval=5000
+    ```
