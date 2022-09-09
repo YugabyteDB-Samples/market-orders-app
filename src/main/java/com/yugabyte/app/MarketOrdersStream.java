@@ -49,7 +49,7 @@ public class MarketOrdersStream {
     /**
      * PubNub stream subscription key.
      */
-    private String STREAM_SUBSCRIPION_KEY = "sub-c-4377ab04-f100-11e3-bffd-02ee2ddab7fe";
+    private String STREAM_SUBSCRIPION_KEY = "sub-c-99084bc5-1844-4e1c-82ca-a01b18166ca8";
 
     /**
      * A pool of connections to the database.
@@ -68,8 +68,7 @@ public class MarketOrdersStream {
     }
 
     public void start() throws SQLException {
-        ResultSet result = dataSource.getConnection().createStatement().
-            executeQuery("SELECT max(id) FROM Buyer");
+        ResultSet result = dataSource.getConnection().createStatement().executeQuery("SELECT max(id) FROM Buyer");
         result.next();
         buyersCount = result.getInt(1);
 
@@ -98,16 +97,13 @@ public class MarketOrdersStream {
             if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
                 // Connect event.
                 System.out.println("Connected to the market orders stream: " + status.toString());
-            }
-            else if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
+            } else if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
                 System.err.println("Connection is lost:" + status.getErrorData().toString());
-            }
-            else if (status.getCategory() == PNStatusCategory.PNReconnectedCategory) {
+            } else if (status.getCategory() == PNStatusCategory.PNReconnectedCategory) {
                 // Happens as part of our regular operation. This event happens when
                 // radio / connectivity is lost, then regained.
                 System.out.println("Reconnected to the market orders stream");
-            }
-            else {
+            } else {
                 System.out.println("Connection status changes:" + status.toString());
             }
         }
@@ -125,7 +121,7 @@ public class MarketOrdersStream {
                     Connection conn = dataSource.getConnection();
 
                     PreparedStatement pStatement = conn.prepareStatement(
-                        "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
+                            "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
 
                     pStatement.setInt(1, new Random().nextInt(buyersCount) + 1);
                     pStatement.setString(2, json.get("symbol").getAsString());
