@@ -13,3 +13,4 @@ properties/google-spanner.properties
 properties/aurora.properties
 properties/cockroach.properties
 spanner/spanner-service-account-keys.json
+.vscode/launch.json
