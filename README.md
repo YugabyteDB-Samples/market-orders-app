@@ -62,7 +62,7 @@ Follow [this page](./demo/demo_sript.md) for more details.
 
 3. Start the app inside a container:
     ```shell
-    docker run --name market-orders-instance --net yugabytedb_network \
+    docker run --name market-orders-instance --net custom-network \
     market-orders-app:latest \
     java -jar /home/target/market-orders-app.jar \
     connectionProps=/home/yugabyte-docker.properties \
