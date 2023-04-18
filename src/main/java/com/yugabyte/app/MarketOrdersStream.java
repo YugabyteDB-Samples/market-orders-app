@@ -155,7 +155,7 @@ public class MarketOrdersStream {
                         continue;
                     } else {
                         e.printStackTrace();
-                        return;
+                        continue;
                     }
                 }
             }

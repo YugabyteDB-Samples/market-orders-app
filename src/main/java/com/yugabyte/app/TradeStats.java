@@ -87,7 +87,7 @@ public class TradeStats {
                             continue;
                         } else {
                             e.printStackTrace();
-                                return;
+                            continue;
                         }
                     }
 
