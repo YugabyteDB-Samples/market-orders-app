@@ -30,15 +30,15 @@ The application subscribes to the [PubNub's market orders stream](https://www.pu
 
     * Connect to Postgres (`./properties/postgres.properties`):
     ```shell
-    java -jar target/market-orders-app.jar connectionProps=./properties/postgres.properties loadScript=./schema/schema_postgres.sql tradeStatsInterval=5000
+    java -jar target/market-orders-app.jar connectionProps=./properties/postgres.properties loadScript=./schema/schema_postgres.sql tradeStatsInterval=2000
     ```
     * Connect to MySQL (`./properties/mysql.properties`):
     ```shell
-    java -jar target/market-orders-app.jar connectionProps=./properties/mysql.properties loadScript=./schema/schema_mysql.sql tradeStatsInterval=5000
+    java -jar target/market-orders-app.jar connectionProps=./properties/mysql.properties refreshView=false loadScript=./schema/schema_mysql.sql tradeStatsInterval=2000
     ``` 
     * Connect to YugabyteDB Managed after providing connecting settings in the `./properties/yugabyte-template.properties` file:
     ```shell
-    java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-template.properties loadScript=./schema/schema_postgres.sql tradeStatsInterval=5000
+    java -jar target/market-orders-app.jar connectionProps=./properties/yugabyte-template.properties refreshView=false loadScript=./schema/schema_postgres.sql tradeStatsInterval=2000
     ```    
 
 The `tradeStatsInterval` (measured in milliseconds) instructs the `TradeStats.java` service to query trade-related statistics from the database within the specified interval. If the interval is <= `0` or not set, then the statistics will not be collected.
