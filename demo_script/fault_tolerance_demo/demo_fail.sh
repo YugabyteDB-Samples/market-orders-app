@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-. demo-magic.sh
+. ../demo-magic.sh
 
 DEMO_PROMPT="${GREEN}➜ ${CYAN}\W ${COLOR_RESET}"
 
