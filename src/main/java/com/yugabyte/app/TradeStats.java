@@ -70,6 +70,14 @@ public class TradeStats {
                             System.out.format("%-16s%-16f\n", result.getString(1), result.getFloat(2));
                         }
 
+                        pStatement = conn.prepareStatement(
+                                "select count(*) from trade where trade_type = 'fill or kill'");
+
+                        result = pStatement.executeQuery();
+                        result.next();
+
+                        System.out.println();
+                        System.out.println("Fill or kill trades: " + result.getInt(1));
                         System.out.println("======================================\n\n");
 
                         // returning connection to the pool (it's not being closed)
