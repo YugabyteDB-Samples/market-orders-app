@@ -24,8 +24,6 @@ CREATE TABLE Trade(
     PRIMARY KEY (id)
 );
 
-CREATE INDEX bid_price_idx ON Trade(bid_price);
-
 CREATE MATERIALIZED VIEW top_buyers_view AS
 SELECT
     first_name,
