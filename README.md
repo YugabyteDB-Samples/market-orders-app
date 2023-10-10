@@ -67,5 +67,5 @@ Follow [this page](./demo/demo_sript.md) for more details.
     java -jar /home/target/market-orders-app.jar \
     connectionProps=/home/yugabyte-docker.properties \
     loadScript=/home/schema_postgres.sql \
-    tradeStatsInterval=5000
+    tradeStatsInterval=2000 refreshView=false
     ```
