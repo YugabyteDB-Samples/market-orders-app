@@ -36,7 +36,6 @@ public class Application {
     public static void main(String args[]) {
         int tradeStatsInterval = 0;
         String connectionPropsFile = "./properties/postgres.properties";
-        boolean refreshMaterializedView = true;
 
         if (args != null) {
             for (String arg : args) {
@@ -47,10 +46,6 @@ public class Application {
                     connectionPropsFile = arg.split("=")[1].trim();
                 } else if (arg.startsWith("loadScript")) {
                     loadScript = arg.split("=")[1].trim();
-                } else if (arg.startsWith("refreshView")) {
-                    // workaround for read replicas case:
-                    // https://yugabyte.atlassian.net/browse/DB-268
-                    refreshMaterializedView = Boolean.valueOf(arg.split("=")[1].trim());
                 }
             }
         }
@@ -71,7 +66,7 @@ public class Application {
             }
 
             System.out.println("Connecting to the market orders stream...");
-            ordersStream = new MarketOrdersStream(dataSource, refreshMaterializedView);
+            ordersStream = new MarketOrdersStream(dataSource);
             ordersStream.start();
             System.out.println("Connected to the stream");
 

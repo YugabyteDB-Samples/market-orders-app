@@ -58,13 +58,8 @@ public class MarketOrdersStream {
 
     private int buyersCount;
 
-    private long topBuyersViewLastRefreshTime;
-
-    private final boolean refreshMaterializedView;
-
-    public MarketOrdersStream(HikariDataSource dataSource, boolean refreshMaterializedView) {
+    public MarketOrdersStream(HikariDataSource dataSource) {
         this.dataSource = dataSource;
-        this.refreshMaterializedView = refreshMaterializedView;
     }
 
     public void start() throws SQLException {
@@ -130,13 +125,6 @@ public class MarketOrdersStream {
                     pStatement.setString(5, json.get("trade_type").getAsString());
 
                     pStatement.executeUpdate();
-
-                    if (refreshMaterializedView && System.currentTimeMillis() - topBuyersViewLastRefreshTime >= 5000) {
-                        pStatement = conn.prepareStatement("REFRESH MATERIALIZED VIEW top_buyers_view;");
-                        pStatement.execute();
-
-                        topBuyersViewLastRefreshTime = System.currentTimeMillis();
-                    }
 
                     // returning connection to the pool (it's not being closed)
                     conn.close();
