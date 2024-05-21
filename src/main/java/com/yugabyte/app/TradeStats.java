@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -76,7 +77,8 @@ public class TradeStats {
                         long start = System.currentTimeMillis();
 
                         pStatement = conn.prepareStatement(
-                                "select first_name from buyer where id = 1");
+                                "select first_name from buyer where id = "
+                                        + new Random().nextInt(ordersStream.getBuyersCount()) + 1);
 
                         result = pStatement.executeQuery();
                         result.next();

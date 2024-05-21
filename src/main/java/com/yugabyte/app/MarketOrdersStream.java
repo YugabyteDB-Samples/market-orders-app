@@ -87,6 +87,10 @@ public class MarketOrdersStream {
         return writeLatency;
     }
 
+    public int getBuyersCount() {
+        return buyersCount;
+    }
+
     private class StreamCallback extends SubscribeCallback {
 
         /**
