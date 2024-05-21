@@ -34,9 +34,12 @@ public class TradeStats {
 
     private volatile boolean keepWorking;
 
-    public TradeStats(HikariDataSource dataSource, int statsInterval) {
+    private MarketOrdersStream ordersStream;
+
+    public TradeStats(HikariDataSource dataSource, MarketOrdersStream ordersStream, int statsInterval) {
         this.dataSource = dataSource;
         this.statsInterval = statsInterval;
+        this.ordersStream = ordersStream;
     }
 
     public void printStats() {
@@ -52,7 +55,7 @@ public class TradeStats {
                         Connection conn = dataSource.getConnection();
 
                         PreparedStatement pStatement = conn.prepareStatement(
-                                "select max(id) from Trade");
+                                "select count(id) from Trade");
 
                         ResultSet result = pStatement.executeQuery();
                         result.next();
@@ -70,14 +73,19 @@ public class TradeStats {
                             System.out.format("%-16s%-16f\n", result.getString(1), result.getFloat(2));
                         }
 
+                        long start = System.currentTimeMillis();
+
                         pStatement = conn.prepareStatement(
-                                "select count(*) from trade where trade_type = 'fill or kill'");
+                                "select first_name from buyer where id = 1");
 
                         result = pStatement.executeQuery();
                         result.next();
 
+                        long readLatency = System.currentTimeMillis() - start;
+
                         System.out.println();
-                        System.out.println("Fill or kill trades: " + result.getInt(1));
+                        System.out.println("Read latency: " + readLatency + "ms");
+                        System.out.println("Write latency: " + ordersStream.getWriteLatency() + "ms");
                         System.out.println("======================================\n\n");
 
                         // returning connection to the pool (it's not being closed)

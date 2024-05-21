@@ -71,7 +71,7 @@ public class Application {
             System.out.println("Connected to the stream");
 
             if (tradeStatsInterval > 0) {
-                TradeStats stats = new TradeStats(dataSource, tradeStatsInterval);
+                TradeStats stats = new TradeStats(dataSource, ordersStream, tradeStatsInterval);
                 stats.printStats();
             }
 

@@ -58,6 +58,8 @@ public class MarketOrdersStream {
 
     private int buyersCount;
 
+    private long writeLatency;
+
     public MarketOrdersStream(HikariDataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -79,6 +81,10 @@ public class MarketOrdersStream {
     public void stop() {
         stream.unsubscribe().execute();
         dataSource.close();
+    }
+
+    public long getWriteLatency() {
+        return writeLatency;
     }
 
     private class StreamCallback extends SubscribeCallback {
@@ -115,6 +121,8 @@ public class MarketOrdersStream {
                 try {
                     Connection conn = dataSource.getConnection();
 
+                    long start = System.currentTimeMillis();
+
                     PreparedStatement pStatement = conn.prepareStatement(
                             "INSERT INTO Trade (buyer_id, symbol, order_quantity, bid_price, trade_type) VALUES(?,?,?,?,?)");
 
@@ -126,6 +134,7 @@ public class MarketOrdersStream {
 
                     pStatement.executeUpdate();
 
+                    writeLatency = System.currentTimeMillis() - start;
                     // returning connection to the pool (it's not being closed)
                     conn.close();
 

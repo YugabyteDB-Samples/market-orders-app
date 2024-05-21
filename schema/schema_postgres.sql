@@ -24,20 +24,6 @@ CREATE TABLE Trade(
     PRIMARY KEY (id)
 );
 
-CREATE MATERIALIZED VIEW top_buyers_view AS
-SELECT
-    first_name,
-    last_name,
-    SUM(bid_price) AS proceeds
-FROM
-    Trade AS t
-    JOIN Buyer AS b ON t.buyer_id = b.id
-GROUP BY
-    (first_name,
-        last_name)
-ORDER BY
-    proceeds DESC;
-
 INSERT INTO Buyer(first_name, last_name, age, goverment_id)
     VALUES ('John', 'Smith', 45, '7bfjd73'),
 ('Arnold', 'Mazer', 55, 'unb23212'),
